@@ -1,0 +1,289 @@
+\documentclass{report}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\title{TODO: Choose Title}
+\author{Adam Kelly}
+\date{January 2017}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{An Introduction to Quantum Computing}
+
+Here I will give a brief overview of the mathematics necessary to follow
+the workings / implementation of the Simulator, and also to refresh
+slightly on the notation and concepts of what will be used throughout
+this paper.\\
+A working knowledge of linear algebra, matrix opperations (\emph{i.e.
+multiplication, transpose, trace and tensor products}) among others,
+along with a basic idea of some Quantum Mechanics / Quantum
+Informational Theory and the workings of Classical Computers, is helpful
+but not 100\% necessary. I will try and keep away from the extreme
+specifics, and the reasons behind everything, to the best of my
+abilities, although some detail is needed in order to portray the ideas
+behind this. If you are interested in learning more, the book
+``\emph{Quantum Computing for Computer Scientists}'' by \emph{Noson
+Yanofsky} and \emph{Mirco Mannucci} is very good.
+
+\subsection{The Qubit}
+
+In classical computing, the bit (short for binary unit) is the smallest
+data unit. It has a \emph{Single binary value, that can be either
+\texttt{0} or \texttt{1}}.\\
+The \emph{qubit} would be the Quantum version of the classical bit.
+However, unlike a classical bit, it can take a superposition, meaning
+that it is possible for a qubit to be in a linear combination of
+states.\\
+In this paper, the choice of basis states (\(Z\)) are as follows:
+\begin{equation}
+	\lvert0\rangle =\left( \begin{matrix} 1\\ 0 \end{matrix} \right), \lvert1\rangle =\left( \begin{matrix} 0\\ 1\end{matrix} \right)
+\end{equation}
+
+The notation used here is called Bra-Ket notation, or Dirac Notation. A
+common use for it is to describe quantum state, which is what will be
+used it for in this paper.\\
+You can think of whats in between the \(\lvert\rangle\) as a label for our
+state.\\
+The difference between the notation above, and notation like
+\(\langle\lvert\), among others, is that one is column vector and the other a
+row vector.\\
+As I said above, it is also possible for a qubit to be in a
+superposition. A single qubit superposition would look like this:\\
+\[
+\left\lvert \Psi \rangle =\alpha\lvert0\rangle +\beta\right\lvert 1\rangle\]\\
+The coefficients - \(\alpha\) and \(\beta\) are complex numbers.
+
+Because this state is a superposition, fundamentally you cannot get
+access to the amplitudes of the base vectors \(\alpha\) and \(\beta\).
+Instead, you will either get \(\lvert0\rangle\) or \(\lvert1\rangle\), with the
+probability of getting \(\lvert0\rangle\) being \(\lvert\alpha\lvert^2\), and the
+probability of getting \(\lvert1\rangle\) being \(\lvert\beta\lvert^2\).\\
+Also, if you add the probabilities, you will always get \(1\), which is
+the normalization.\\
+\[
+\lvert\alpha\lvert^2 + \lvert\beta\lvert^2 = 1\]\\
+If an operation is being performed on a qubit with multiple states, the
+operation is performed on all of the states at the same time. However,
+when observed, the qubit will collapse into either \(0\) or \(1\),
+stochastically, based on the probability of each of the basic states.\\
+This property can be realised by using partical spin, among others, but
+I will not get into that as this project is on a practical
+implementation of a quantum computer.\\
+Richard Feynman (a theoretical physicist known for his contribution to
+quantum mechanics) suggested that a qubit,
+\(\alpha\lvert0\rangle + \beta\lvert1\rangle\), occupies all possible states
+between \(0\) and \(1\), thereby making it possible to encode an
+infinite amount of data. Although, when observed, collapses into a state
+of 0 or 1, thus making the data held in the superpositions useless. This
+is why \emph{Quantum Algorithms} are used to exploit this trait.
+
+Just like a classical computer, while it is possible to have a single
+qubit quantum computer, it's not going to be much use. To use the power
+of quantum computing you need to have more then 1 qubit.\\
+To define more then 1 qubit, you use a \emph{register}. For example, if
+you wanted to put the value \texttt{11010} Onto 5 qubits, you set the
+state as shown:\\
+\[
+\lvert11010\rangle\]\\
+which is equal to:\\
+\[
+\lvert11010\rangle = \lvert1\rangle \otimes \lvert1\rangle \otimes \lvert0\rangle \otimes \lvert1\rangle \otimes \lvert0\rangle\]\\
+where \(\otimes\) is the tensor product.\\
+A Quantum Register is just a number of qubits, tensored together.\\
+An \emph{n-bit} Quantum Register can hold any number of \emph{n-qubit}
+states / superpositions.
+
+\subsection{Quantum Logic Gates}
+
+Now that I have defined the qubit, we can now move onto quantum logic
+gates.\\
+Just like classical logic gates, they work on the register to change the
+values (or states) or the bits (or qubits).\\
+However, unlike classical computing, all quantum logic gates are
+reversible (although you can use reversible gates in classical
+computation).\\
+Quantum logic gates are represented by \emph{unitary matrices}, and most
+logic gates act on either One or Two Qubits. Hence, they can be
+described by a \texttt{2x2} or \texttt{4x4} Unitary Matrix.\\
+A unitary matrix is defined so that:
+
+\begin{quote}
+A Complex, Square Matrix, \textbf{U} is unitary if its complex conjugate
+(U*) is also its inverse
+\end{quote}
+
+Also, just to recap, when calculating the result of the gates, you must
+remember that states are just vectors, so\\
+\[\lvert1\rangle =\left( \begin{matrix} 0\\ 1\end{matrix} \right)\]\\
+\[
+V_1\lvert0\rangle + V_2\lvert1\rangle =\left( \begin{matrix} V_1\\ V_2\end{matrix} \right)\]\\
+and\\
+\[
+V_1\lvert00\rangle + V_2\lvert01\rangle + V_3\lvert10\rangle + V_4\lvert11\rangle =\left( \begin{matrix} V_1\\V_2\\V_3\\ V_4\end{matrix} \right)\]\\
+Now with that defined, I will now show you some logic gates.
+
+\subsubsection{The NOT Gate / Pauli-X Gate}
+
+This is probably the Simplest gate, and it acts very similarly to the NOT gate in classical computing.
+This gate acts on a single qubit, and as you can probably tell, flips the value of the qubit.
+Because of this it's sometimes called the bit-flip gate.\\
+This gate represents a rotation around a
+\href{https://en.wikipedia.org/wiki/Bloch_sphere}{Bloch Sphere} by the
+\(x\)-axis by \(\pi\) radians.\\
+It maps \(\lvert0\rangle\) to \(\lvert1\rangle\), and \(\lvert1\rangle\) to
+\(\lvert0\rangle\).\\
+And for a superposition, it just flips the bits, i.e.:\\
+\[
+\alpha\lvert0\rangle + \beta\lvert1\rangle \Rightarrow \alpha\lvert1\rangle + \beta\lvert0\rangle\]\\
+This gate can be represented using this matrix:\\
+\[X = \left[ \begin{matrix} 0 & 1\\1 & 0\end{matrix} \right]\]
+
+\subsubsection{Pauli-Y Gate}
+
+This gate acts on a single qubit, and works out to a rotation around a
+Bloch Sphere on the \(y\) axis by \(\pi\) radians.\\
+It maps the basic states as follows:\\
+\[
+\lvert0\rangle \Rightarrow i\lvert1\rangle, \lvert1\rangle \Rightarrow -i\lvert0\rangle\]\\
+Its matrix form:\\
+\[
+Y = \left[ \begin{matrix} 0 & -i\\i & 0\end{matrix} \right]\]
+
+\subsubsection{Pauli-Z Gate}
+
+This gate again acts on a single qubit, and equates to a rotation on a
+Bloch Sphere on the \(z\) axis by \(\pi\) radians.\\
+It leaves the basic state \(\lvert0\rangle\) Unchanged, and maps the state
+\(\lvert1\rangle \Rightarrow -\lvert1\rangle\). It's also sometimes called the
+\emph{`Phase Change Gate'} Due to this.\\
+Its matrix form:\\
+\[
+Z = \left[ \begin{matrix} 1 & 0\\0 & -1\end{matrix} \right]\]
+
+\subsubsection{The Hadamard Gate}
+
+The purpose of this gate is to map the state of a qubits basic state to
+2 superpositions, each of equal weight, which meaning the probability of
+each state being chosen is equal.\\
+It represents a combination of two rotations around a Bloch Sphere,
+\(\pi /2\) about the Y-axis \(\pi\) about the X-axis.\\
+It maps the states as shown:\\
+\[
+\lvert0\rangle \Rightarrow \frac{\lvert0\rangle + \lvert1\rangle}{ \sqrt{2}}                 \lvert1\rangle \Rightarrow \frac{\lvert0\rangle - \lvert1\rangle}{ \sqrt{2}}\]\\
+It can represented using the Hadamard matrix:\\
+\[
+H = \frac{1}{\sqrt{2}} \left[ \begin{matrix} 1 & 1\\1 & -1\end{matrix} \right]\]\\
+You can define these states:\\
+\[
+\lvert+\rangle = \frac{\lvert0\rangle +\lvert1\rangle}{\sqrt{2}}, \lvert-\rangle = \frac{\lvert0\rangle -\lvert1\rangle}{\sqrt{2}}\]\\
+Where \(\lvert+\rangle\) and \(\lvert-\rangle\) make up a new basis state called
+the \emph{conjugate / diagonal} state, or \(X\)
+
+\subsubsection{The Identity Gate}
+
+This gate simply maps the qubits state from input to output, i.e. It is
+unchanged. $|0\rangle \Rightarrow |0\rangle, |1\rangle \Rightarrow |1\rangle$. Its Matrix is:\\
+\[
+Id = \left[ \begin{matrix} 1 & 0\\0 & 1\end{matrix} \right]\]
+
+\subsubsection{The S / Phase Gate}
+
+Another Basis State is the \emph{Circular} Basis, $Y$,
+$\lvert\circlearrowright\rangle$ and $\lvert\circlearrowleft\rangle$, with the
+states both equating to:\\
+\[
+\lvert\circlearrowright\rangle = \frac{\lvert0\rangle +i\lvert1\rangle}{\sqrt{2}}, \lvert\circlearrowleft\rangle = \frac{\lvert0\rangle -i\lvert1\rangle}{\sqrt{2}}\]\\
+To make these states, you need an a new gate \(S\) or \emph{Phase
+Gate}.\\
+The Phase Gate's Matrix looks like this:\\
+\[
+S = \left[ \begin{matrix} 1 & 0\\0 & i\end{matrix} \right]\]\\
+When used on a qubit $\lvert1\rangle$ after a Hadamard gate (\(H\)), it
+applies a \emph{Complex Phase} (Hence the name, Phase Gate), and you can
+get the state \(\lvert\circlearrowright\rangle\).\\
+To get the state \(\lvert\circlearrowleft\rangle\), you use the same pattern,
+but replacing the gate \(S\) with \(S^\dagger\).\\
+You can represent \(S^\dagger\) With the matrix:\\
+\[
+S^\dagger = \left[ \begin{matrix} 1 & 0\\0 & -i\end{matrix} \right]\]
+
+\subsubsection{Multi Qubit Gates}
+
+Up until now, we have only looked at gates that act on a single qubit.\\
+It is at this point that you have to remember the exponential growth of
+states in qubits, one of the factors that makes it hard to simulate a
+quantum computer.\\
+In short, the complex vector space for a 5 qubit system has a dimension
+equal to \(2^5\) or \(32\). Now if you look at, for example, a 64 qubit
+system, you get \(2^64 = 18446744073709551616\), or just under eighteen
+and a half quintillion. As you can probably see, in an \(n\)th qubit
+system, you need \(2^n\) numbers to represent its state. This growth is
+exponential, and if you had a \(300\) qubit system, you would need more
+numbers then there are atoms in the universe to represent its state.\\
+If you want to see this in effect, look at the standard basis, or all
+the possible binary strings. For 2 qubits,\\
+\[
+\{\lvert00\rangle, \lvert01\rangle, \lvert10\rangle, \lvert11\rangle\}\]\\
+or for 3 qubits:\\
+\[
+\{\lvert000\rangle, \lvert001\rangle, \lvert010\rangle, \lvert011\rangle, \lvert100\rangle, \lvert101\rangle, \lvert110\rangle, \lvert111\rangle,\}\]\\
+A Classical computer also needs \(2^n\) Numbers to define what position
+the bits are in, but this is much simpler then in Quantum Computing,
+where you don't just have a single set state, but rather, due to
+Superpositions and Entanglement, the set at any point is very different.
+To describe the quantum state, you need \(2^n\) Complex Numbers. Now,
+onto some gates.
+
+\subsubsection{CNOT / Controlled Not Gate}
+
+This is gate is an example of Condition Based Logic, which is needed to
+do anything interesting in Quantum Computing. This Gate, the CNOT, is
+the only one that will be implemented in the simulator, to show the
+purpose of Conditional Logic. \\
+What this gate does, is if the control qubit is \(\lvert1\rangle\), then it
+applies a NOT (\(X\)) Gate to the target qubit, otherwise, it does
+nothing. Unlike its classical counterpart, the XOR gate, it is
+reversible (Like all quantum gates), and it does this by having 2
+outputs.\\
+The CNOT's matrix form is:\\
+\[
+CNOT = \left[ \begin{matrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0     & 0 & 0 & 1 \\ 0 & 0 & 1  & 0\end{matrix} \right]\]
+
+\subsubsection{T or Pi/8 Gate}
+
+The reason that I have this gate included is because of a few things. So
+far, all of the gates we have gone through
+\(\{ X,Y,Z,H,S,S^\dagger, CNOT \}\), are all part of whats called a
+Clifford Group. Every gate in the Clifford group can be simulated pretty
+well on a classical computer (See
+\href{https://en.wikipedia.org/wiki/Gottesman\%E2\%80\%93Knill_theorem}{Here}),
+and therefore the Clifford group is not \emph{universal} (Basically that
+any possible operation on a quantum computer can be reduced to and
+preformed on, see
+\href{https://en.wikipedia.org/wiki/Quantum_gate\#Universal_quantum_gates}{Here}).
+To use the `Quantum Computer' (The simulator) properly, we will need to
+include another gate, thats not part of the Clifford Group. For this, we
+will use \(T\) and \(T^\dagger\).\\
+They can be represented with the matrices:\\
+\[
+T = \left[ \begin{matrix} 1 & 0\\0 & e\frac{i\pi}{4}\end{matrix} \right], T^\dagger = \left[ \begin{matrix} 1 & 0\\0 & e-\frac{i\pi}{4}\end{matrix} \right]\]
+
+The \(T\) Gate makes it possible to access all points on a Bloch
+Sphere.\\
+This is all of the gates that will be implemented into the simulator.
+
+
+\end{document}
