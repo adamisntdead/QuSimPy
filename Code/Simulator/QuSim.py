@@ -1,5 +1,6 @@
 import random
 from math import e, log, pi, sqrt
+import string
 
 import numpy as np
 
@@ -47,7 +48,13 @@ class gates:
     ])
     TDagger = T.conjugate().transpose()
 
-    # CNOT Gate, Control is 0, Target is 1
+    SWAP = np.matrix([
+        [1, 0, 0, 0],
+        [0, 0, 1, 0],
+        [0, 1, 0, 0],
+        [0, 0, 0, 1]
+    ])
+
     CNOT = np.matrix([
         [1, 0, 0, 0],
         [0, 1, 0, 0],
@@ -65,38 +72,92 @@ class gates:
         print(eval(gateStr))
 
     @staticmethod
-    def generateGate(gate, numQubits, targetQubit):
-        # Put these here for handyness
-        identity = gates.Id
-        mainGate = eval('gates.' + gate)
+    def isUnitary(matrix):
+        # Returns True if the matirix is unitary, useful for testing new gates
+        return np.allclose(np.eye(matrix.shape[0]), matrix.H * matrix)
 
-        # Check if there is no modification needed
-        if numQubits == 1:
-            return mainGate
+    @staticmethod
+    def generateGate(gate, numQubits, qubit1, qubit2=-1):
+        if (gate == 'CNOT' and qubit2 != -1):
+            control = qubit1
+            target = qubit2
+            
+            # Generates List of Combinations of each qubit. there is 2n of them.
+            # Returns List in string form, in the variable opts
+            opts = []
+            for i in range(0, (2**numQubits)):
+                opts.append(np.binary_repr(i, width=numQubits))
 
-        newMatrix = np.matrix('0 0')
-        firstGate = identity
+            # Goes through the list of possible binary strings, makes a new list of
+            # What index maps to what
+            mapList = []
+            for index, option in enumerate(opts):
+                nums = list(option)
+                if nums[control - 1] == '1':
+                    mapList.append([index, -1])
+                else:
+                    mapList.append([index, index])
+                    
+            for j, index in enumerate(mapList):
+                if index[1] == -1:
+                    # Takes the option and splits to each charachter
+                    firstList = list(opts[index[0]])
+                    
+                    # Figure out if looking for 0 or 1
+                    toFlip = '0'
+                    if firstList[target-1] == '0':
+                        toFlip = '1'
+                    elif firstList[target-1] == '1':
+                        toFlip = '0'
+                    
+                    
+                    targetPattern = firstList
+                    targetPattern[target-1] = toFlip
+                    # The String Searching For
+                    targetPattern = string.join(targetPattern, '')
+                    # The Index of the new strng
+                    mapList[j][1] = opts.index(targetPattern)
+            
+            # Generate Empty Matrix To Use To Create New One 
+            newMatrix = np.zeros((2**numQubits, 2**numQubits))
+            
+            # Go through the map of 1's and put them in 
+            for item in mapList:
+                newMatrix.itemset((item[0], item[1]), 1)
+            
+            return np.asmatrix(newMatrix)            
+        else:
+            # Put these here for handyness
+            identity = gates.Id
+            mainGate = eval('gates.' + gate)
 
-        for num in range(1, numQubits + 1):
-            if num == 1:
-                # If its the first, then we cant do anything untill the
-                # Next itteration, so store the value
-                if targetQubit == 1:
-                    firstGate = mainGate
+            # Check if there is no modification needed
+            if numQubits == 1:
+                return mainGate
+
+            newMatrix = np.matrix('0 0')
+            firstGate = identity
+
+            for num in range(1, numQubits + 1):
+                if num == 1:
+                    # If its the first, then we cant do anything untill the
+                    # Next itteration, so store the value
+                    if qubit1 == 1:
+                        firstGate = mainGate
+                    else:
+                        firstGate = identity
+                elif num == 2:
+                    # If its the second itteration
+                    if qubit1 == 2:
+                        newMatrix = np.kron(firstGate, mainGate)
+                    else:
+                        newMatrix = np.kron(firstGate, identity)
                 else:
-                    firstGate = identity
-            elif num == 2:
-                # If its the second itteration
-                if targetQubit == 2:
-                    newMatrix = np.kron(firstGate, mainGate)
-                else:
-                    newMatrix = np.kron(firstGate, identity)
-            else:
-                if targetQubit == num:
-                    newMatrix = np.kron(newMatrix, mainGate)
-                else:
-                    newMatrix = np.kron(newMatrix, identity)
-        return newMatrix
+                    if qubit1 == num:
+                        newMatrix = np.kron(newMatrix, mainGate)
+                    else:
+                        newMatrix = np.kron(newMatrix, identity)
+            return newMatrix
 
 
 class QuantumRegister:
@@ -117,9 +178,14 @@ class QuantumRegister:
     def amps(self):
         return self.amplitudes
 
-    def applyGate(self, gate, target):
-        gateMatrix = gates.generateGate(gate, self.numQubits, target)
-        self.amplitudes = np.dot(self.amplitudes, gateMatrix)
+    def applyGate(self, gate, qubit1, qubit2=-1):
+        if gate == 'CNOT':
+            gateMatrix = gates.generateGate(gate, self.numQubits, qubit1, qubit2)
+            self.amplitudes = np.dot(self.amplitudes, gateMatrix)
+        else:
+            # Qubit 1 is the target
+            gateMatrix = gates.generateGate(gate, self.numQubits, qubit1)
+            self.amplitudes = np.dot(self.amplitudes, gateMatrix)
 
     def measure(self):
         if self.measured:
@@ -149,9 +215,8 @@ class QuantumRegister:
             return self.value
 
 
-qureg = QuantumRegister(5)
+qureg = QuantumRegister(10)
 qureg.applyGate('X', 1)
-qureg.applyGate('H', 3)
-qureg.applyGate('TDagger', 3)
-qureg.applyGate('X', 5)
+qureg.applyGate('X', 2)
+qureg.applyGate('CNOT', 1, 2)
 print(qureg.measure())
