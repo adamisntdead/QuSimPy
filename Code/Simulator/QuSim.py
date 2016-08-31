@@ -1,6 +1,6 @@
 import random
-from math import e, log, pi, sqrt
 import string
+from math import e, log, pi, sqrt
 
 import numpy as np
 
@@ -81,7 +81,7 @@ class gates:
         if (gate == 'CNOT' and qubit2 != -1):
             control = qubit1
             target = qubit2
-            
+
             # Generates List of Combinations of each qubit. there is 2n of them.
             # Returns List in string form, in the variable opts
             opts = []
@@ -97,35 +97,34 @@ class gates:
                     mapList.append([index, -1])
                 else:
                     mapList.append([index, index])
-                    
+
             for j, index in enumerate(mapList):
                 if index[1] == -1:
                     # Takes the option and splits to each charachter
                     firstList = list(opts[index[0]])
-                    
+
                     # Figure out if looking for 0 or 1
                     toFlip = '0'
-                    if firstList[target-1] == '0':
+                    if firstList[target - 1] == '0':
                         toFlip = '1'
-                    elif firstList[target-1] == '1':
+                    elif firstList[target - 1] == '1':
                         toFlip = '0'
-                    
-                    
+
                     targetPattern = firstList
-                    targetPattern[target-1] = toFlip
+                    targetPattern[target - 1] = toFlip
                     # The String Searching For
                     targetPattern = string.join(targetPattern, '')
                     # The Index of the new strng
                     mapList[j][1] = opts.index(targetPattern)
-            
-            # Generate Empty Matrix To Use To Create New One 
+
+            # Generate Empty Matrix To Use To Create New One
             newMatrix = np.zeros((2**numQubits, 2**numQubits))
-            
-            # Go through the map of 1's and put them in 
+
+            # Go through the map of 1's and put them in
             for item in mapList:
                 newMatrix.itemset((item[0], item[1]), 1)
-            
-            return np.asmatrix(newMatrix)            
+
+            return np.asmatrix(newMatrix)
         else:
             # Put these here for handyness
             identity = gates.Id
@@ -180,7 +179,8 @@ class QuantumRegister:
 
     def applyGate(self, gate, qubit1, qubit2=-1):
         if gate == 'CNOT':
-            gateMatrix = gates.generateGate(gate, self.numQubits, qubit1, qubit2)
+            gateMatrix = gates.generateGate(
+                gate, self.numQubits, qubit1, qubit2)
             self.amplitudes = np.dot(self.amplitudes, gateMatrix)
         else:
             # Qubit 1 is the target
@@ -213,10 +213,3 @@ class QuantumRegister:
             )
             self.measured = True
             return self.value
-
-
-qureg = QuantumRegister(10)
-qureg.applyGate('X', 1)
-qureg.applyGate('X', 2)
-qureg.applyGate('CNOT', 1, 2)
-print(qureg.measure())
