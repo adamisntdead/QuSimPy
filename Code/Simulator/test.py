@@ -1,6 +1,6 @@
 import unittest
-import QuSim
 
+import QuSim
 
 ###########################################
 #                Cases                    #
@@ -29,8 +29,11 @@ CNOT3.applyGate('CNOT', 3, 7)
 ###########################################
 #                Tests                    #
 ###########################################
+
+
 class QuSimTests(unittest.TestCase):
     # X Gate
+
     def testXGate(self):
         self.assertEqual(X.measure(), '1')
 
@@ -42,8 +45,10 @@ class QuSimTests(unittest.TestCase):
         self.assertEqual(CNOT2.measure(), '0010001000')
         self.assertEqual(CNOT3.measure(), '001000000')
 
+
 def main():
     unittest.main()
+
 
 if __name__ == '__main__':
     main()
