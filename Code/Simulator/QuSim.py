@@ -48,13 +48,6 @@ class gates:
     ])
     TDagger = T.conjugate().transpose()
 
-    SWAP = np.matrix([
-        [1, 0, 0, 0],
-        [0, 0, 1, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 1]
-    ])
-
     CNOT = np.matrix([
         [1, 0, 0, 0],
         [0, 1, 0, 0],
