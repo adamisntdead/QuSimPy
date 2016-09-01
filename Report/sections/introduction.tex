@@ -3,18 +3,12 @@
 \begin{document}
 
 
-Here I will give a brief overview of the mathematics necessary to follow
-the workings / implementation of the Simulator, and also to refresh
-slightly on the notation and concepts of what will be used throughout
-this paper.\\
-A working knowledge of linear algebra, matrix operations (\emph{i.e.
-multiplication, transpose, trace and tensor products}) among others,
-along with a basic idea of some Quantum Mechanics / Quantum
-Informational Theory and the workings of Classical Computers, is helpful
-but not 100\% necessary. I will try and keep away from the extreme
-specifics, and the reasons behind everything, to the best of my
-abilities, although some detail is needed in order to portray the ideas
-behind this. If you are interested in learning more, the book
+Here I will give a brief overview of the whats necessary to follow
+the workings / implementation of the Simulator and then the programming language, and also to look over the notation and concepts that will be used throughout this paper.\\
+A familiarity with some linear algebra 
+along with a basic idea of some Quantum Mechanics and the workings of Classical Computers, is helpful
+but not 100\% necessary. \\
+If you are interested in learning more about Quantum Computing, the book
 ``\emph{Quantum Computing for Computer Scientists}'' \cite{quantumcomputerscience} is very good.
 
 \subsection{The Qubit}
@@ -22,9 +16,9 @@ behind this. If you are interested in learning more, the book
 In classical computing, the bit (short for binary unit) is the smallest
 data unit. It has a \emph{Single binary value, that can be either
 \texttt{0} or \texttt{1}}.\\
-The \emph{qubit} would be the Quantum version of the classical bit.
+The \emph{qubit} is the Quantum analog of the classical bit.
 However, unlike a classical bit, it can take a superposition, meaning
-that it is possible for a qubit to be in a linear combination of
+that it is possible for a qubit to be in a combination of
 states.\\
 In this paper, the choice of basis states (\(Z\)) are as follows:
 \begin{equation}
@@ -43,15 +37,15 @@ As I said above, it is also possible for a qubit to be in a
 superposition. A single qubit superposition would look like this:\\
 \[
 \left\lvert \Psi \rangle =\alpha\lvert0\rangle +\beta\right\lvert 1\rangle\]\\
-The coefficients - \(\alpha\) and \(\beta\) are complex numbers.
+The coefficients, \(\alpha\) and \(\beta\) can be complex numbers.
 
 Because this state is a superposition, fundamentally you cannot get
-access to the amplitudes of the base vectors \(\alpha\) and \(\beta\).
+access to the amplitudes of \(\alpha\) and \(\beta\).
 Instead, you will either get \(\lvert0\rangle\) or \(\lvert1\rangle\), with the
 probability of getting \(\lvert0\rangle\) being \(\lvert\alpha\lvert^2\), and the
 probability of getting \(\lvert1\rangle\) being \(\lvert\beta\lvert^2\).\\
 Also, if you add the probabilities, you will always get \(1\), which is
-the normalization.\\
+the normalization principle.\\
 \begin{equation}
 	\lvert\alpha\lvert^2 + \lvert\beta\lvert^2 = 1
 \end{equation}
@@ -59,20 +53,13 @@ the normalization.\\
 If an operation is being performed on a qubit with multiple states, the
 operation is performed on all of the states at the same time. However,
 when observed, the qubit will collapse into either \(0\) or \(1\),
-stochastically, based on the probability of each of the basic states.\\
-This property can be realised by using partical spin, among others, but
-I will not get into that as this project is on a practical
+based on the probability of each of the basic states.\\
+A Qubit can be created by using partical spin, among other methods, but
+I will not get into that as this project is not about the practical
 implementation of a quantum computer.\\
-Richard Feynman (a theoretical physicist known for his contribution to
-quantum mechanics) suggested that a qubit,
-\(\alpha\lvert0\rangle + \beta\lvert1\rangle\), occupies all possible states
-between \(0\) and \(1\), thereby making it possible to encode an
-infinite amount of data. Although, when observed, collapses into a state
-of 0 or 1, thus making the data held in the superpositions useless. This
-is why \emph{Quantum Algorithms} are used to exploit this trait.
 
 Just like a classical computer, while it is possible to have a single
-qubit quantum computer, it's not going to be much use. To use the power
+qubit quantum computer, it's not going to be of much use. To use the power
 of quantum computing you need to have more then 1 qubit.\\
 To define more then 1 qubit, you use a \emph{register}. For example, if
 you wanted to put the value \texttt{11010} Onto 5 qubits, you set the
@@ -82,10 +69,8 @@ state as shown:\\
 which is equal to:\\
 \[
 \lvert11010\rangle = \lvert1\rangle \otimes \lvert1\rangle \otimes \lvert0\rangle \otimes \lvert1\rangle \otimes \lvert0\rangle\]\\
-where \(\otimes\) is the tensor product.\\
-A Quantum Register is just a number of qubits, tensored together.\\
-An \emph{n-bit} Quantum Register can hold any number of \emph{n-qubit}
-states / superpositions.
+where \(\otimes\) is the kronecker product.\\
+An n-Qubit Quantum Register can be described as just the kronecker product of n-Qubits\\
 
 \subsection{Quantum Logic Gates}
 
@@ -102,7 +87,7 @@ described by a \texttt{2x2} or \texttt{4x4} Unitary Matrix.\\
 A unitary matrix is defined so that:
 
 \begin{quote}
-A Complex, Square Matrix, \textbf{U} is unitary if its complex conjugate
+A Complex, Square Matrix, \textbf{U}, is unitary if its complex conjugate
 (U*) is also its inverse
 \end{quote}
 
@@ -136,7 +121,7 @@ This gate can be represented using this matrix:\\
 
 \subsubsection{Pauli-Y Gate}
 
-This gate acts on a single qubit, and works out to a rotation around a
+This gate acts on a single qubit, and works as a rotation around a
 Bloch Sphere on the \(y\) axis by \(\pi\) radians.\\
 It maps the basic states as follows:\\
 \[
@@ -224,7 +209,7 @@ states in qubits, one of the factors that makes it hard to simulate a
 quantum computer.\\
 In short, the complex vector space for a 5 qubit system has a dimension
 equal to \(2^5\) or \(32\). Now if you look at, for example, a 64 qubit
-system, you get \(2^64 = 18446744073709551616\), or just under eighteen
+system, you get \(2^{64} = 18446744073709551616\), or just under eighteen
 and a half quintillion. As you can probably see, in an \(n\)th qubit
 system, you need \(2^n\) numbers to represent its state. This growth is
 exponential, and if you had a \(300\) qubit system, you would need more
@@ -236,12 +221,11 @@ the possible binary strings. For 2 qubits,\\
 or for 3 qubits:\\
 \[
 \{\lvert000\rangle, \lvert001\rangle, \lvert010\rangle, \lvert011\rangle, \lvert100\rangle, \lvert101\rangle, \lvert110\rangle, \lvert111\rangle,\}\]\\
-A Classical computer also needs \(2^n\) Numbers to define what position
-the bits are in, but this is much simpler then in Quantum Computing,
+A Classical computer needs \(2\) Numbers to define what position
+the bits are in, which is much simpler then in Quantum Computing,
 where you don't just have a single set state, but rather, due to
-Superpositions and Entanglement, the set at any point is very different.
-To describe the quantum state, you need \(2^n\) Complex Numbers. Now,
-onto some gates.
+Superpositions and Entanglement, the state at any point is very different.
+To describe the quantum state, you need \(2^n\) Complex Numbers. 
 
 \subsubsection{CNOT / Controlled Not Gate}
 
@@ -258,24 +242,21 @@ The CNOT's matrix form is:\\
 \begin{equation}
 	CNOT = \left[ \begin{matrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0     & 0 & 0 & 1 \\ 0 & 0 & 1  & 0\end{matrix} \right]
 \end{equation}
+(Note: The equation above (12), shows a CNOT gate, acting on 2 qubits, with the 1st Qubit being the control, and the target being the 2nd Qubit.)
 
 \subsubsection{T or Pi/8 Gate}
 
 The reason that I have this gate included is because of a few things. So
 far, all of the gates we have gone through
 \(\{ X,Y,Z,H,S,S^\dagger, CNOT \}\), are all part of whats called a
-Clifford Group. Every gate in the Clifford group can be simulated pretty
-well on a classical computer (See the Gottesman-Knill Theorem \cite{gottesmanknill}),
-and therefore the Clifford group is not \emph{universal} (Basically that
+Clifford Group. The Clifford group is not \emph{universal} (Basically the the set of gate to which
 any possible operation on a quantum computer can be reduced to and
-preformed on, see
-\href{https://en.wikipedia.org/wiki/Quantum_gate\#Universal_quantum_gates}{Here}).
-To use the `Quantum Computer' (The simulator) properly, we will need to
-include another gate, thats not part of the Clifford Group. For this, we
+preformed on)
+To use the `Quantum Computer' (The simulator) properly, another gate will need to be implemented, thats not part of the Clifford Group. For this, I
 will use \(T\) and \(T^\dagger\).\\
 They can be represented with the matrices:\\
 \begin{equation}
-	T = \left[ \begin{matrix} 1 & 0\\0 & e^\frac{i\pi}{4}\end{matrix} \right], T^\dagger = \left[ \begin{matrix} 1 & 0\\0 & e^-\frac{i\pi}{4}\end{matrix} \right]
+	T = \left[ \begin{matrix} 1 & 0\\0 & e^\frac{i\pi}{4}\end{matrix} \right], T^\dagger = \left[ \begin{matrix} 1 & 0\\0 & e^{\frac{-i\pi}{4}}\end{matrix} \right]
 \end{equation}
 
 The \(T\) Gate makes it possible to access all points on a Bloch
