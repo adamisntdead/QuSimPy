@@ -173,10 +173,6 @@ class QuantumRegister:
         # Set the fact it has not been measured
         self.measured = False
 
-    # Delete This, as amplitudes should not be accessable
-    def amps(self):
-        return self.amplitudes
-
     def applyGate(self, gate, qubit1, qubit2=-1):
         if gate == 'CNOT':
             gateMatrix = gates.generateGate(
