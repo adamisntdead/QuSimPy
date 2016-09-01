@@ -8,17 +8,53 @@
 \usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{csquotes}
+\usepackage{courier}
+\usepackage{pgf,tikz}
+\usepackage{mathrsfs}
+\usetikzlibrary{arrows}
+\usepackage{listings}
+\usepackage{fontbook}
+\usepackage{color}
+
+\definecolor{uuuuuu}{rgb}{0.26666666666666666,0.26666666666666666,0.26666666666666666}
+\definecolor{zzttqq}{rgb}{0.6,0.2,0.}
+\definecolor{qqqqff}{rgb}{0.,0.,1.}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{style=mystyle}
 \usepackage[
 backend=biber,
 style=numeric
 ]{biblatex}
 \addbibresource{sections/ref.bib}
- 
+
 \title{Designing a High Level Programming Language for Quantum Computing}
 \subtitle{For the implementation and simulation of Classical and Quantum Algorithms}
 \author{Adam Kelly}
 \date{January 2017}
- 
+
 \begin{document}
 
 \begin{titlepage}
@@ -28,10 +64,24 @@ style=numeric
 \newpage
 \tableofcontents
 \newpage
- 
+
 \section{An Introduction to Quantum Computing}
 \subfile{sections/introduction}
- 
+
+\section{Simulating a Quantum Computer}
+\subfile{sections/simulation}
+
+\newpage
+\section{Appendix}
+\subsection{Creating Controlled Unitary Gates}
+\subfile{appedix/controlledGates}
+
+\subsection{Source Code}
+
+\emph{QuSim.py | Main Simulator}
+%\lstinputlisting[language=Python]{../Code/Simulator/QuSim.py}
+
 \newpage
 \printbibliography
+\newpage
 \end{document}

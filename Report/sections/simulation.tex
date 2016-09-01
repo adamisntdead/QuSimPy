@@ -1,0 +1,104 @@
+\documentclass[../main.tex]{subfiles}
+ 
+\begin{document}
+When thinking of simulating a Quantum Computer, there are a number of possible ways to implement it, depending on what you want from your simulator.
+Regardless of what method, it will always get exponentially slower as you add more qubits to simulate, as the number of amplitudes you need to store is \(2^n\). 
+To get the most accurate simulation, you need to also simulate 'Decoherence', which is where the system will loose information by the outside environment, although the simulator detailed here is called an 'Ideal' Simulator, as it doesn't also simulate Decoherence.
+In this project, the simulator will be built upon vector-matrix opperations.
+
+\subsection{Quantum Register}
+To first start the simulator, you have to have a new quantum register object. When a new Quantum Register is created, it creates a new \(2^n\) dimensional vector of zero, and then it sets the first 0 to 1. This is the same as representing an n qubit state, and setting all n qubits to the state \(\lvert0\rangle\). Remember:
+
+$$
+\lvert q_1 q_2...q_n \rangle = \lvert q1 \rangle \otimes \lvert q2 \rangle \otimes ... \otimes \lvert q_n \rangle
+$$
+
+So therefore, the vector that must be stored for 4 qubits in the state of 0000 is:
+
+$$
+\lvert0000\rangle = \lvert0\rangle \otimes \lvert0\rangle \otimes \lvert0\rangle \otimes \lvert0\rangle = \left( \begin{matrix} 1 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \\ 0 \end{matrix} \right)
+$$
+
+When a new Quantum Register Is Defined, it stores the vector, so that gates can be applied to it.
+
+For Source Code see the \emph{QuantumRegister} Class, in the \emph{\_\_init\_\_} function.
+
+\subsection{Matrix Generation}
+If you look at the gates defined in the Previous Section, 'Quantum Logic Gates' (For Example, Equation (3)), they are all either \(2\times2\) or \(4\times4\) Matrices, which means that they can only be applied to either a 2 or 4 dimensional vector. This is a problem for our computational model, as we create a large \(2^n\) Dimensional Vector.
+
+\subsubsection{Expanding Single Qubit Gates}
+Essentially, what we are trying to do it take a 2x2 matrix, and scale it up, so that it a \(2^n\) x \(2^n\) matrix. Whats important, is that the new matrix must only affect the qubit its targeting. For example, if I had a 4 Qubit Register, and I wanted to apply an \(X\) Gate to the 3rd Qubit, The equation for that new matrix is \(X_{3,4} = Id \otimes Id \otimes X \otimes Id \), with \(Id\) Being a 2x2 Identity Matrix. \\
+To generalise this further, to create the gate \(G_{m,n}\) (With \(n\) being the number of qubits in the register, \(m\) being the number of the qubit the gate will act on, and \(G\) Being the 2x2 gate that will be applied to that qubit), 
+you can use the equation:
+
+\begin{equation}
+	G_{m,n} = \underset{i=1}{\overset{n}{\otimes}}
+	\begin{cases}
+    	G & \text{if} \quad i = m \\
+    	Id & \text{if} \quad i \neq m
+	\end{cases}
+\end{equation}
+
+(Note: \(\underset{i=1}{\overset{n}{\otimes}}\) is like \(\underset{i=1}{\overset{n}{\sum}}\), but using the kronecker product, instead of the sum.)
+
+\subsubsection{Expanding Multi-Qubit Gates}
+Focusing on Controlled Gates, there are a number of ways to expand / scale up multi-qubit gates, but most of them are quite long winded (See the appendix for a general expansion method),
+but the way that the CNOT / Controlled X Gate is implemented in the simulator, is using a Input-Output like structure to generate a new matrix. \\
+There is no equation for this gate (Again, see the appendices for a full, generalised mathematical solution), but the generation method for this simulator can be shown using the source code. \\ \\ 
+See the \emph{Gate} class, and the \emph{generateGate} method.
+
+\subsection{Applying Gates}
+Once there is a state vector and a full, unitary matrix to apply to it,
+you can then apply the gate by using the dot product of the state or amplitude vector (\(\psi\)), and the matrix of the gate \(G\) \\
+\begin{equation}
+	\lvert\psi\rangle \cdot G
+\end{equation}
+
+For example, to apply a Pauli-X Gate (Not Gate) to the second qubit of a 2-Qubit Register, it would look as shown (Keep in mind the previous Gate Matrix Generation Equations):
+
+$$
+	Id = \left [\begin{matrix}
+		1 && 0 \\
+		0 && 1
+	\end{matrix}\right]
+$$
+	\\
+$$
+	X = \left [\begin{matrix}
+		0 && 1 \\
+		1 && 0
+	\end{matrix}\right]
+$$
+	\\
+$$	
+	X_{2,2} = Id \otimes X = \left [\begin{matrix}
+		0 && 1 && 0 && 0 \\
+		1 && 0 && 0 && 0 \\
+		0 && 0 && 0 && 1 \\
+		0 && 0 && 1 && 0
+	\end{matrix}\right]
+$$	
+
+$$
+\lvert00\rangle \cdot X_{2,2} = \left[\begin{matrix}
+		0 && 1 && 0 && 0 \\
+		1 && 0 && 0 && 0 \\
+		0 && 0 && 0 && 1 \\
+		0 && 0 && 1 && 0
+\end{matrix}\right] \cdot \left[\begin{matrix}
+	1 \\
+	0 \\
+	0 \\
+	0 \\
+\end{matrix}\right] = \left[\begin{matrix}
+	0 \\
+	1 \\
+	0 \\
+	0 \\
+\end{matrix}\right] = \lvert01\rangle
+$$
+		
+
+\end{document}
+
+
