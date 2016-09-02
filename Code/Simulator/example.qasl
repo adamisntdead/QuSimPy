@@ -1,0 +1,5 @@
+QUREG newRegister [3]
+H newRegister [2]
+CNOT newRegister[1][3]
+Y newRegister[2]
+MEASURE newRegister
