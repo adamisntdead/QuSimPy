@@ -48,26 +48,9 @@ class gates:
     ])
     TDagger = T.conjugate().transpose()
 
-    CNOT = np.matrix([
-        [1, 0, 0, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 1],
-        [0, 0, 1, 0]
-    ])
-
     ####################################################
     #                Helper Functions                  #
     ####################################################
-
-    @staticmethod
-    def printmatrix(title):
-        gateStr = 'gates.' + title
-        print(eval(gateStr))
-
-    @staticmethod
-    def isUnitary(matrix):
-        # Returns True if the matirix is unitary, useful for testing new gates
-        return np.allclose(np.eye(matrix.shape[0]), matrix.H * matrix)
 
     @staticmethod
     def generateGate(gate, numQubits, qubit1, qubit2=-1):
@@ -153,7 +136,6 @@ class gates:
 
 
 class QuantumRegister:
-
     def __init__(self, numQubits):
         self.numQubits = numQubits
         # The number of amplitudes needed is 2^n,
