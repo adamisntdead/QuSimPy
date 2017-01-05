@@ -40,7 +40,7 @@ you can use the equation:
 (Note: \(\underset{i=1}{\overset{n}{\otimes}}\) is like \(\underset{i=1}{\overset{n}{\sum}}\), but using the kronecker product, instead of the sum.)
 
 \subsubsection{Expanding Multi-Qubit Gates}
-Focusing on Controlled Gates, there are a number of ways to expand / scale up multi-Qubit gates, but most of them are quite long winded (See the appendix for a general expansion method),
+Focusing on Controlled Gates, there are a number of ways to expand / scale up Multi-Qubit gates, but most of them are quite long winded (See the appendix for a general expansion method),
 but the way that the CNOT / Controlled X Gate is implemented in the simulator, is using a Input-Output like structure to generate a new matrix. \\
 There is no equation for this gate (Again, see the appendices for a full, generalised mathematical solution), but the generation method for this simulator can be shown using the source code. \\ \\ 
 
@@ -109,15 +109,15 @@ $$
 
 This is done each time a new register is made, so it is in the \emph{init} function of the \emph{QuantumRegister} class.
 
-\lstinputlisting[language=Python,firstline=146,lastline=157]{../Code/Simulator/QuSim.py}
+\lstinputlisting[language=Python,firstline=109,lastline=121]{../Code/Simulator/QuSim.py}
 
 \subsubsection{Writing the Gate Generator}
 All of the single qubit gates are hardcoded into the simulator using a Dictionary data structure. For example, the Pauli-X gate is:
-\lstinputlisting[language=Python,firstline=16,lastline=20]{../Code/Simulator/QuSim.py}
+\lstinputlisting[language=Python,firstline=17,lastline=21]{../Code/Simulator/QuSim.py}
 Although some of the gates are coded in using functions from Numpy, for example the identity gate:
-\lstinputlisting[language=Python,firstline=36,lastline=37]{../Code/Simulator/QuSim.py}
+\lstinputlisting[language=Python,firstline=37,lastline=38]{../Code/Simulator/QuSim.py}
 The 'Dagger' Gates:
-\lstinputlisting[language=Python,firstline=38,lastline=55]{../Code/Simulator/QuSim.py}
+\lstinputlisting[language=Python,firstline=39,lastline=56]{../Code/Simulator/QuSim.py}
 
 To generate the gates, the formula \ref{eq:single-gate-gen}
 is used.
@@ -127,63 +127,33 @@ The gate generation function takes four inputs:
 	\item \emph{gate}: The gate to be applied (i.e. X)
 	\item \emph{numQubits}: The number of qubits in the register the gate will be applied to.
 	\item \emph{qubit1}: The main qubit. In the case of a single qubit gate, it will be the qubit the gate is to be applied on. In the case of a Controled gate (CNOT), it is the target
-	\item \emph{qubit2}: In the case that its a controlled gate being applied (CNOT), then this would be the target qubit. It has a default value of -1, and doesn't need to be used if its not a CNOT
+	\item \emph{qubit2}: In the case that its a controlled gate being applied (CNOT), then this would be the target qubit. It has a default value of 1, and doesn't need to be used if its not a CNOT
 \end{itemize}
 
-First of all, it is checked if there even needs to be a new gate. 
-If there is only one qubit, then the original gate (\(G\) in the formula) is returned.
+The way the function works is that it builds up a list of operations, and then uses the \emph{reduce()} function to run the calculation. This is the same as formula ~\ref{eq:single-gate-gen}, where builds up the order and then uses the kronecker product on them. The function is:
+
 
 \begin{lstlisting}[language=Python]
-def generateGate(gate, numQubits, qubit1):
-	# Put these here for handyness
-    identity = gates.singleQubitGates['Id']
-    mainGate = gates.singleQubitGates[gate]
-    
-    # Check if there is no modification needed
-    if numQubits == 1:
-    	return mainGate
+def generateGate(gate, numQubits, qubit1, qubit2=1):
+    else:
+        # Put these here for handyness
+        identity = gates.singleQubitGates['Id']
+        mainGate = gates.singleQubitGates[gate]
+
+        gateOrder = []
+
+        for i in range(1, numQubits + 1):
+            if (i == qubit1):
+                gateOrder.append(mainGate)
+            else:
+                gateOrder.append(identity)
+
+        return reduce(np.kron, gateOrder)
 \end{lstlisting}
 
-So if there is more then one qubit, then the formula needs to be used. Here is the function with the formula.
+So that code works if you want to generate a gate that only acts on one qubit, but we have to do something else if we want to use a CNOT gate. The way this function works is based on the "Formula" in the Appendix, and the finished Gate Generation function is this:
 
-\begin{lstlisting}[language=Python]
-def generateGate(gate, numQubits, qubit1):
-	# Put these here for handyness
-    identity = gates.singleQubitGates['Id']
-    mainGate = gates.singleQubitGates[gate]
-    
-    # Check if there is no modification needed
-    if numQubits == 1:
-    	return mainGate
-
-	# Declare the variables here os they are accessable
-    newMatrix = None
-    firstGate = None
-
-	# Itterate through, as per the formula
-    for num in range(1, numQubits + 1):
-        if num == 1:
-            # If its the first, then we cant do anything untill the
-            # Next itteration, so store the value
-            if qubit1 == 1:
-                firstGate = mainGate
-            else:
-                firstGate = identity
-        elif num == 2:
-            # If its the second itteration
-            if qubit1 == 2:
-                newMatrix = np.kron(firstGate, mainGate)
-            else:
-                newMatrix = np.kron(firstGate, identity)
-        else:
-            if qubit1 == num:
-                newMatrix = np.kron(newMatrix, mainGate)
-            else:
-                newMatrix = np.kron(newMatrix, identity)
-    return newMatrix
-\end{lstlisting}
-
-So that code works if you want to generate a gate that only acts on one qubit, but we have to do something else if we want to use a CNOT gate.
+\lstinputlisting[language=Python,firstline=63,lastline=106]{../Code/Simulator/QuSim.py}
 
 \end{document}
 

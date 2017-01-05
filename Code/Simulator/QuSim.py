@@ -1,6 +1,7 @@
 import random
 import string
 from math import e, log, pi, sqrt
+from functools import reduce
 
 import numpy as np
 
@@ -55,95 +56,58 @@ class gates:
         ]).conjugate().transpose()
     }
 
-
     ####################################################
     #                Helper Functions                  #
     ####################################################
 
     @staticmethod
-    def generateGate(gate, numQubits, qubit1, qubit2=-1):
-        if (gate == 'CNOT' and qubit2 != -1):
+    def generateGate(gate, numQubits, qubit1, qubit2=1):
+        if (gate == 'CNOT'):
             control = qubit1
             target = qubit2
 
-            # Generates List of Combinations of each qubit. there is 2n of them.
-            # Returns List in string form, in the variable opts
-            opts = []
-            for i in range(0, (2**numQubits)):
-                opts.append(np.binary_repr(i, width=numQubits))
+            identity = np.eye(2)
+            X = gates.singleQubitGates['X']
+            # NaN is our 'C' from the multi qubit gate generation formula
+            C = np.mat([
+                [float('nan'), 0],
+                [0, 1]
+            ])
 
-            # Goes through the list of possible binary strings, makes a new list of
-            # What index maps to what
-            mapList = []
-            for index, option in enumerate(opts):
-                nums = list(option)
-                if nums[control - 1] == '1':
-                    mapList.append([index, -1])
+            # Set the gate order
+            gateOrder = []
+            for i in range(1, numQubits + 1):
+                if (i == control):
+                    gateOrder.append(C)
+                elif (i == target):
+                    gateOrder.append(X)
                 else:
-                    mapList.append([index, index])
+                    gateOrder.append(identity)
 
-            for j, index in enumerate(mapList):
-                if index[1] == -1:
-                    # Takes the option and splits to each charachter
-                    firstList = list(opts[index[0]])
+            # Generate the gate and then replace the NaNs to Id gates
+            newGate = reduce(np.kron, gateOrder)
 
-                    # Figure out if looking for 0 or 1
-                    toFlip = '0'
-                    if firstList[target - 1] == '0':
-                        toFlip = '1'
-                    elif firstList[target - 1] == '1':
-                        toFlip = '0'
+            n = newGate.shape[0]
+            return np.mat([[newGate[i, j] if not np.isnan(newGate[i, j]) else 1 if i == j else 0 for j in range(n)] for i in range(n)])
 
-                    targetPattern = firstList
-                    targetPattern[target - 1] = toFlip
-                    # The String Searching For
-                    targetPattern = ''.join(targetPattern)
-                    # The Index of the new strng
-                    mapList[j][1] = opts.index(targetPattern)
-
-            # Generate Empty Matrix To Use To Create New One
-            newMatrix = np.zeros((2**numQubits, 2**numQubits))
-
-            # Go through the map of 1's and put them in
-            for item in mapList:
-                newMatrix.itemset((item[0], item[1]), 1)
-
-            return np.asmatrix(newMatrix)
         else:
             # Put these here for handyness
             identity = gates.singleQubitGates['Id']
             mainGate = gates.singleQubitGates[gate]
 
-            # Check if there is no modification needed
-            if numQubits == 1:
-                return mainGate
+            gateOrder = []
 
-            newMatrix = None
-            firstGate = None
-
-            for num in range(1, numQubits + 1):
-                if num == 1:
-                    # If its the first, then we cant do anything untill the
-                    # Next itteration, so store the value
-                    if qubit1 == 1:
-                        firstGate = mainGate
-                    else:
-                        firstGate = identity
-                elif num == 2:
-                    # If its the second itteration
-                    if qubit1 == 2:
-                        newMatrix = np.kron(firstGate, mainGate)
-                    else:
-                        newMatrix = np.kron(firstGate, identity)
+            for i in range(1, numQubits + 1):
+                if (i == qubit1):
+                    gateOrder.append(mainGate)
                 else:
-                    if qubit1 == num:
-                        newMatrix = np.kron(newMatrix, mainGate)
-                    else:
-                        newMatrix = np.kron(newMatrix, identity)
-            return newMatrix
+                    gateOrder.append(identity)
+
+            return reduce(np.kron, gateOrder)
 
 
 class QuantumRegister:
+
     def __init__(self, numQubits):
         self.numQubits = numQubits
         # The number of amplitudes needed is 2^n,
@@ -158,7 +122,8 @@ class QuantumRegister:
 
     def applyGate(self, gate, qubit1, qubit2=-1):
         if self.measured:
-            raise ValueError('Cannot Apply Gate to a Measured Quantum Register')
+            raise ValueError(
+                'Cannot Apply Gate to a Measured Quantum Register')
         else:
             if gate == 'CNOT':
                 gateMatrix = gates.generateGate(
