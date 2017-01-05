@@ -118,8 +118,8 @@ class gates:
             if numQubits == 1:
                 return mainGate
 
-            newMatrix = np.matrix('0 0')
-            firstGate = identity
+            newMatrix = None
+            firstGate = None
 
             for num in range(1, numQubits + 1):
                 if num == 1:

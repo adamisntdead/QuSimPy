@@ -331,3 +331,6 @@ $RECYCLE.BIN/
 
 .texpadtmp
 *.pdf
+
+__pycache__
+*.pyc
