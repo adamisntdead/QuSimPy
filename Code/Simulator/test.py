@@ -32,8 +32,6 @@ CNOT3.applyGate('CNOT', 3, 7)
 
 
 class QuSimTests(unittest.TestCase):
-    # X Gate
-
     def testXGate(self):
         self.assertEqual(X.measure(), '1')
 

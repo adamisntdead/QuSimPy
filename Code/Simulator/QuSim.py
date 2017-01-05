@@ -12,41 +12,49 @@ class gates:
     ####################################################
     #                    Gates                         #
     ####################################################
+    singleQubitGates = {
+        # Pauli-X / Not Gate
+        'X': np.matrix([
+            [0, 1],
+            [1, 0]
+        ]),
+        # Pauli-Y Gate
+        'Y': np.matrix([
+            [0, -i],
+            [i, 0]
+        ]),
+        # Pauli-Z Gate
+        'Z': np.matrix([
+            [1, 0],
+            [0, -1]
+        ]),
+        # Hadamard Gate
+        'H': np.multiply(1. / sqrt(2), np.matrix([
+            [1, 1],
+            [1, -1]
+        ])),
+        # Identity Gate
+        'Id': np.eye(2),
+        # S & S Dagger Gate
+        'S': np.matrix([
+            [1, 0],
+            [0, i]
+        ]),
+        'SDagger': np.matrix([
+            [1, 0],
+            [0, i]
+        ]).conjugate().transpose(),
+        # T & T Dagger / Pi over 8 Gate
+        'T': np.matrix([
+            [1, 0],
+            [0, e**(i * pi / 4.)]
+        ]),
+        'TDagger': np.matrix([
+            [1, 0],
+            [0, e**(i * pi / 4.)]
+        ]).conjugate().transpose()
+    }
 
-    # Pauli-X / Not Gate
-    X = np.matrix([
-        [0, 1],
-        [1, 0]
-    ])
-    # Pauli-Y Gate
-    Y = np.matrix([
-        [0, -i],
-        [i, 0]
-    ])
-    # Pauli-Z Gate
-    Z = np.matrix([
-        [1, 0],
-        [0, -1]
-    ])
-    # Hadamard Gate
-    H = np.multiply(1. / sqrt(2), np.matrix([
-        [1, 1],
-        [1, -1]
-    ]))
-    # Identity Gate
-    Id = np.eye(2)
-    # S & S Dagger Gate
-    S = np.matrix([
-        [1, 0],
-        [0, i]
-    ])
-    SDagger = S.conjugate().transpose()
-    # T & T Dagger / Pi over 8 Gate
-    T = np.matrix([
-        [1, 0],
-        [0, e**(i * pi / 4.)]
-    ])
-    TDagger = T.conjugate().transpose()
 
     ####################################################
     #                Helper Functions                  #
@@ -89,7 +97,7 @@ class gates:
                     targetPattern = firstList
                     targetPattern[target - 1] = toFlip
                     # The String Searching For
-                    targetPattern = string.join(targetPattern, '')
+                    targetPattern = ''.join(targetPattern)
                     # The Index of the new strng
                     mapList[j][1] = opts.index(targetPattern)
 
@@ -103,8 +111,8 @@ class gates:
             return np.asmatrix(newMatrix)
         else:
             # Put these here for handyness
-            identity = gates.Id
-            mainGate = eval('gates.' + gate)
+            identity = gates.singleQubitGates['Id']
+            mainGate = gates.singleQubitGates[gate]
 
             # Check if there is no modification needed
             if numQubits == 1:
