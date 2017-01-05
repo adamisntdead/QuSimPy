@@ -125,14 +125,9 @@ class QuantumRegister:
             raise ValueError(
                 'Cannot Apply Gate to a Measured Quantum Register')
         else:
-            if gate == 'CNOT':
-                gateMatrix = gates.generateGate(
-                    gate, self.numQubits, qubit1, qubit2)
-                self.amplitudes = np.dot(self.amplitudes, gateMatrix)
-            else:
-                # Qubit 1 is the target
-                gateMatrix = gates.generateGate(gate, self.numQubits, qubit1)
-                self.amplitudes = np.dot(self.amplitudes, gateMatrix)
+            gateMatrix = gates.generateGate(
+                gate, self.numQubits, qubit1, qubit2)
+            self.amplitudes = np.dot(self.amplitudes, gateMatrix)
 
     def measure(self):
         if self.measured:

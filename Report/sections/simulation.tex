@@ -4,7 +4,7 @@
 When thinking of simulating a Quantum Computer, there are a number of possible ways to implement it, depending on what you want from your simulator.
 Regardless of what method, it will always get exponentially slower as you add more Qubits to simulate, as the number of amplitudes you need to store is \(2^n\). 
 To get the most accurate simulation, you need to also simulate 'Decoherence', which is where the system will loose information due to measurements by the outside environment, although the simulator detailed here is called an 'Ideal' Simulator, as it doesn't also simulate Decoherence.
-In this project, the simulator will be built upon vector-matrix opperations.
+In this project, the simulator will be built upon vector-matrix operations.
 
 \subsection{Quantum Register}
 When you start the simulator, you have to have a new Quantum Register. When a new Quantum Register is created, it creates a new \(2^n\) dimensional vector of zero, and then it sets the first 0 to 1. This is the same as representing an n Qubit state, and setting all n Qubits to the state \(\lvert0\rangle\). Remember:
@@ -126,7 +126,7 @@ The gate generation function takes four inputs:
 \begin{itemize}
 	\item \emph{gate}: The gate to be applied (i.e. X)
 	\item \emph{numQubits}: The number of qubits in the register the gate will be applied to.
-	\item \emph{qubit1}: The main qubit. In the case of a single qubit gate, it will be the qubit the gate is to be applied on. In the case of a Controled gate (CNOT), it is the target
+	\item \emph{qubit1}: The main qubit. In the case of a single qubit gate, it will be the qubit the gate is to be applied on. In the case of a Controlled gate (CNOT), it is the target
 	\item \emph{qubit2}: In the case that its a controlled gate being applied (CNOT), then this would be the target qubit. It has a default value of 1, and doesn't need to be used if its not a CNOT
 \end{itemize}
 
@@ -136,7 +136,7 @@ The way the function works is that it builds up a list of operations, and then u
 \begin{lstlisting}[language=Python]
 def generateGate(gate, numQubits, qubit1, qubit2=1):
     else:
-        # Put these here for handyness
+        # Put these here for handiness
         identity = gates.singleQubitGates['Id']
         mainGate = gates.singleQubitGates[gate]
 
@@ -151,10 +151,39 @@ def generateGate(gate, numQubits, qubit1, qubit2=1):
         return reduce(np.kron, gateOrder)
 \end{lstlisting}
 
-So that code works if you want to generate a gate that only acts on one qubit, but we have to do something else if we want to use a CNOT gate. The way this function works is based on the "Formula" in the Appendix, and the finished Gate Generation function is this:
+So that code works if you want to generate a gate that only acts on one qubit,
+but we have to do something else if we want to use a CNOT gate.
+The way this part of the function works is based on the "Formula" in the Appendix,
+and the finished Gate Generation function is this:
 
 \lstinputlisting[language=Python,firstline=63,lastline=106]{../Code/Simulator/QuSim.py}
 
+\subsubsection{Applying the Gates to the Register}
+
+After the gates have been generated, they can now be applied to the register.
+This function first checks if the register has been measured, as you cannot apply a gate to a register that has been measured.
+The function, \emph{applyGate}, takes the same inputs as generateGate() but after getting the generated gates, then is multiplies the Amplitude vector by the new gate, which applies it. 
+
+\lstinputlisting[language=Python,firstline=123,lastline=130]{../Code/Simulator/QuSim.py}
+
+\subsubsection{Taking Measurements}
+So at this point the simulator can:
+ \begin{enumerate}
+   \item Create a Qubit Register
+   \item Generate Gates that can be applied to that register
+   \item Apply that gate to the register
+ \end{enumerate}
+Now all that is left to implement is the Measurement function.
+
+You should recall that the probability of measuring one of the basis states is the amplitude squared.
+With this in mind, I will implement the measurement function just like a weighted number picker.
+
+First of all, the measurement function uses a \emph{for} loop to loop through all of the amplitudes in the register. The absolute value of each amplitude is squared and then its added to a list of all the probablilities. 
+Then, these probabilities are used to generate the list index. when a choice is made, then it is converted to its binary form, which would be what the state is. (for example, if it chose the 7th list item, then that would be \(\lvert 111 \rangle \)).
+The code is:
+\lstinputlisting[language=Python,firstline=132,lastline=157]{../Code/Simulator/QuSim.py}
+
+So thats the simulator complete! You can see the finished source code in the Appendix.
 \end{document}
 
 

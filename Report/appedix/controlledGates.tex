@@ -3,10 +3,11 @@
 \begin{document}
 
 One method of creating 'Controlled Unitary-2x2 Gates',
-that involves a new number \(c\), or the control value. 
-When working with this value, it has all of the properties of a real number (\(\mathbb{R}\)), except that the kronecker product of any matrix \(M\), and \(c\) is:
+that involves a new value \(c\), or the control value. It is a fairly "Hacky" Solution but it works.
+
+When working with this value, c, it has all of the properties of a real number (\(\mathbb{R}\)), except that the product of any matrix \(M\), and \(c\) is:
 \begin{equation}
-	c \otimes M = c \cdot Id
+	c \cdot M = c \cdot Id
 \end{equation}
 With \(Id\) Being a 2x2 Identity matrix. \\
 Now with a control matrix, \(C = \begin{bmatrix} c & 0 \\ 0 & 1\end{bmatrix}\), You can create any controlled matrix \(CG_{control, target, n}\) (With \(G\) being the 2x2 matrix you want to apply, \(control\) being the number of the qubit controlling the opperation, \(target\) being the number of the qubit you want to apply \(G\) to conditionally, and \(n\) being the total number of qubits in the register) with this equation:
