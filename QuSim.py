@@ -118,7 +118,7 @@ class QuantumRegister:
         # Set the chance of getting all Zeros to 1
         self.amplitudes[0] = 1
         # Set the fact it has not been measured
-        self.measured = False
+        self.value = False
 
     def applyGate(self, gate, qubit1, qubit2=-1):
         if self.measured:
@@ -130,7 +130,7 @@ class QuantumRegister:
             self.amplitudes = np.dot(self.amplitudes, gateMatrix)
 
     def measure(self):
-        if self.measured:
+        if self.value:
             return self.value
         else:
             # Get this list of probabilities, by squaring the absolute
@@ -153,5 +153,4 @@ class QuantumRegister:
                 np.random.choice(results, 1, p=self.probabilities),
                 self.numQubits
             )
-            self.measured = True
             return self.value
