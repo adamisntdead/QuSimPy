@@ -1,6 +1,3 @@
-import random
-import string
-from math import e, log, pi, sqrt
 from functools import reduce
 
 import numpy as np
@@ -30,7 +27,7 @@ class gates:
             [0, -1]
         ]),
         # Hadamard Gate
-        'H': np.multiply(1. / sqrt(2), np.matrix([
+        'H': np.multiply(1. / np.sqrt(2), np.matrix([
             [1, 1],
             [1, -1]
         ])),
@@ -48,11 +45,11 @@ class gates:
         # T & T Dagger / Pi over 8 Gate
         'T': np.matrix([
             [1, 0],
-            [0, e**(i * pi / 4.)]
+            [0, np.e**(i * np.pi / 4.)]
         ]),
         'TDagger': np.matrix([
             [1, 0],
-            [0, e**(i * pi / 4.)]
+            [0, np.e**(i * np.pi / 4.)]
         ]).conjugate().transpose()
     }
 
@@ -121,7 +118,7 @@ class QuantumRegister:
         self.value = False
 
     def applyGate(self, gate, qubit1, qubit2=-1):
-        if self.measured:
+        if self.value:
             raise ValueError(
                 'Cannot Apply Gate to a Measured Quantum Register')
         else:
