@@ -43,6 +43,15 @@ class QuSimTests(unittest.TestCase):
         self.assertEqual(CNOT2.measure(), '0010001000')
         self.assertEqual(CNOT3.measure(), '001000000')
 
+    def testRemeasure(self):
+        self.assertEqual(CNOT1.measure(), '0000000000')
+        self.assertEqual(CNOT2.measure(), '0010001000')
+        self.assertEqual(CNOT3.measure(), '001000000')
+
+    def testReapplyGate(self):
+        with self.assertRaises(ValueError):
+            CNOT1.applyGate('X', 4)
+
 
 def main():
     unittest.main()
