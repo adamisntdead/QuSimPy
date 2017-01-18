@@ -141,9 +141,7 @@ class QuantumRegister:
             # ie, if the list index was 3, well it would actually be 3 in binary, and then we can just append
             # The zeros to the state. To Choose a state, we need a list, so we
             # will make a new list:
-            results = []
-            for prob in self.probabilities:
-                results.append(len(results))
+            results = list(range(len(self.probabilities)))
             # Now we can choose and set the value, so when called again we get
             # the same result.
             self.value = np.binary_repr(
