@@ -2,6 +2,9 @@
 
 Qusim.py is a toy multi-qubit quantum computer simulator, written in 150 lines of python
 
+This code makes it easy for you to see how a quantum computer computes by
+following the linear algebra!
+
 ```python
 from QuSim import QuantumRegister
 
