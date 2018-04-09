@@ -1,7 +1,5 @@
 from functools import reduce
-
 import numpy as np
-
 
 class gates:
     # Store complex number i here for easy access
