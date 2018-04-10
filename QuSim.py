@@ -143,7 +143,7 @@ class QuantumRegister:
             # Now we can choose and set the value, so when called again we get
             # the same result.
             self.value = np.binary_repr(
-                np.random.choice(results, 1, p=self.probabilities),
+                np.random.choice(results, p=self.probabilities),
                 self.numQubits
             )
             return self.value
