@@ -1,6 +1,7 @@
 from functools import reduce
 import numpy as np
 
+
 class gates:
     # Store complex number i here for easy access
     i = np.complex(0, 1)
@@ -89,15 +90,8 @@ class gates:
             # Put these here for handyness
             identity = gates.singleQubitGates['Id']
             mainGate = gates.singleQubitGates[gate]
-
-            gateOrder = []
-
-            for i in range(1, numQubits + 1):
-                if (i == qubit1):
-                    gateOrder.append(mainGate)
-                else:
-                    gateOrder.append(identity)
-
+            gateOrder = (mainGate if i == qubit1 else identity
+                         for i in range(1, numQubits + 1)])
             return reduce(np.kron, gateOrder)
 
 
