@@ -91,7 +91,7 @@ class gates:
             identity = gates.singleQubitGates['Id']
             mainGate = gates.singleQubitGates[gate]
             gateOrder = (mainGate if i == qubit1 else identity
-                         for i in range(1, numQubits + 1)])
+                         for i in range(1, numQubits + 1))
             return reduce(np.kron, gateOrder)
 
 
