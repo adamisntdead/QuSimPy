@@ -1,4 +1,5 @@
 # QuSim.py
+[![Build Status](https://travis-ci.org/adamisntdead/QuSimPy.svg?branch=master)](https://travis-ci.org/adamisntdead/QuSimPy)
 
 Qusim.py is a toy multi-qubit quantum computer simulator, written in 150 lines of python
 
