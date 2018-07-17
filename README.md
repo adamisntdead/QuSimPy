@@ -1,4 +1,5 @@
 # QuSim.py
+
 [![Build Status](https://travis-ci.org/adamisntdead/QuSimPy.svg?branch=master)](https://travis-ci.org/adamisntdead/QuSimPy)
 
 Qusim.py is a toy multi-qubit quantum computer simulator, written in 150 lines of python
@@ -12,14 +13,14 @@ from QuSim import QuantumRegister
 #############################################
 #                 Introduction              #
 #############################################
-# Here Will Be A Few Example of Different   #
-# Quantum States / Algorithms, So You Can   #
-# Get A Feel For How The Module Works, and  #
-# Some Algorithmic Ideas                    #
-#############################################
+# Here Will Be A Few Example of Different
+# Quantum States / Algorithms, So You Can
+# Get A Feel For How The Module Works, and  
+# Some Algorithmic Ideas
+
 
 #############################################
-#            Quantum Measurement              #
+#            Quantum Measurement            #
 #############################################
 # This experiment will prepare 2 states, of a
 # Single qubit, and of 5 qubits, and will just

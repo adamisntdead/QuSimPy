@@ -2,12 +2,8 @@ from functools import reduce
 import numpy as np
 
 class gates:
-    # Store complex number i here for easy access
     i = np.complex(0, 1)
 
-    ####################################################
-    #                    Gates                         #
-    ####################################################
     singleQubitGates = {
         # Pauli-X / Not Gate
         'X': np.matrix([
@@ -50,10 +46,6 @@ class gates:
             [0, np.e**(i * np.pi / 4.)]
         ]).conjugate().transpose()
     }
-
-    ####################################################
-    #                Helper Functions                  #
-    ####################################################
 
     @staticmethod
     def generateGate(gate, numQubits, qubit1, qubit2=1):
@@ -98,23 +90,23 @@ class QuantumRegister:
 
     def __init__(self, numQubits):
         self.numQubits = numQubits
-        # The number of amplitudes needed is 2^n,
-        # Where N is the number of qubits. The np.zeros function
-        # Creates a matrix of 0s, ie.
-        # np.zeros(5) = [0, 0, 0, 0, 0]
+
+        # The number of amplitudes needed is 2^n, where N is the 
+        # number of qubits, So start with a vector of zeros.
         self.amplitudes = np.zeros(2**numQubits)
-        # Set the chance of getting all Zeros to 1
+        # Set the probabilit of getting 0 when measured to 1
         self.amplitudes[0] = 1
-        # Set the fact it has not been measured
+
         self.value = False
 
     def applyGate(self, gate, qubit1, qubit2=-1):
         if self.value:
-            raise ValueError(
-                'Cannot Apply Gate to a Measured Quantum Register')
+            raise ValueError('Cannot Apply Gate to Measured Register')
         else:
+            # Generate the gate matrix
             gateMatrix = gates.generateGate(
                 gate, self.numQubits, qubit1, qubit2)
+            # Calculate the new state vector by multiplying by the gate
             self.amplitudes = np.dot(self.amplitudes, gateMatrix)
 
     def measure(self):
@@ -122,21 +114,20 @@ class QuantumRegister:
             return self.value
         else:
             # Get this list of probabilities, by squaring the absolute
-            # Value of the amplitudes
+            # value of the amplitudes
             self.probabilities = []
             for amp in np.nditer(self.amplitudes):
                 probability = np.absolute(amp)**2
                 self.probabilities.append(probability)
-            # Now that we have the probabilities, we can use them to choose a list index,
-            # Which actually we can convert to the states, as the list counts up in a binary pattern.
-            # ie, if the list index was 3, well it would actually be 3 in binary, and then we can just append
-            # The zeros to the state. To Choose a state, we need a list, so we
-            # will make a new list:
+
+            # Now, we need to make a weighted random choice of all of the possible
+            # output states (done with the range function)
+
             results = list(range(len(self.probabilities)))
-            # Now we can choose and set the value, so when called again we get
-            # the same result.
             self.value = np.binary_repr(
                 np.random.choice(results, p=self.probabilities),
                 self.numQubits
             )
             return self.value
+
+# And thats it!
