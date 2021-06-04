@@ -115,5 +115,5 @@ print('CNOT on 11: |' + OneOne.measure() + '>')
 
 Largely based on the code from [corbett/QuantumComputing](https://github.com/corbett/QuantumComputing).
 
-If you are interested in a efficient, high performance, hardware accelerated
-quantum computer simulator written in Rust, please check out [QCGPU](https://github.com/qcgpu/qcgpu-rust)
+If you are interested in an efficient, high performance, hardware accelerated
+quantum computer simulator, please check out [QCGPU](https://github.com/libtangle/qcgpu)
